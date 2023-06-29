@@ -12,34 +12,27 @@ class webserverHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            if self.path.endswith("/hello"):
-                self.send_response(HTTPStatus.OK)
-                self.send_header('Content-Type', 'text/html')
+            print("Request for " + self.path);
+            if self.path in ["/favicon.ico","/pump.html"]:
+                file_to_open = open("." + self.path, 'rb').read()
+                self.send_response(200)
                 self.end_headers()
-
-                output = ""
-                output += '<html><body>Hello!'
-                output += '<form method="POST" enctype="multipart/form-data" action="/hello"><h2> What would you like me to say?</h2><input name="message" type="text" /><input type="submit" value="Submit" /></form>'
-                output += '</body></html>'
-                self.wfile.write(output.encode())
-                print(output)
+                self.wfile.write(file_to_open)
                 return
-
-            if self.path.endswith("/hola"):
-                self.send_response(HTTPStatus.OK)
-                self.send_header('Content-Type', 'text/html')
+            elif self.path in ["/pump-status"]:
+                self.send_response(200)
                 self.end_headers()
-
-                output = ""
-                output += '<html><body>&#161Hola <a href="/hello">Back to Hello</a>'
-                output += '<form method="POST" enctype="multipart/form-data" action="/hello"><h2> What would you like me to say?</h2><input name="message" type="text" /><input type="submit" value="Submit" /></form>'
-                output += '</body></html>'
-                self.wfile.write(output.encode())
-                print(output)
+                self.wfile.write("01101100".encode())
+                return
+            else:
+                self.send_response(HTTPStatus.TEMPORARY_REDIRECT)
+                self.send_header('Content-Type', 'text/html')
+                self.send_header('Location', '/pump.html')
+                self.end_headers()
                 return
 
         except IOError:
-            self.send_error(404, "File not found %s" % self.path)
+            self.send_error(404, "File not found.")
 
     def do_POST(self):
         try:
