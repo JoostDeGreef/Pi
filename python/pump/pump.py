@@ -1,28 +1,63 @@
 #!/usr/bin/python3
 
 from http import HTTPStatus
-
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-import cgi
+import random
 import sys
+import json
 
 class webserverHandler(BaseHTTPRequestHandler):
     """docstring for webserverHandler"""
 
+    def handleCommand(self, cmd):
+        # cmd: 'Toggle' / 'Off' / 'On'
+        # valve: [1-6]
+        # pump: 'All'
+        print(cmd)
+        try:
+            match cmd["cmd"].lower():
+                case 'toggle':
+                    state = 2
+                case 'off':
+                    state = 0
+                case 'on':
+                    state = 1
+                case _:
+                    raise Exception("Command not accepted")
+            if "valve" in cmd:
+                valve = cmd["valve"]
+                if valve<1 or valve>6:
+                    raise Exception("Valve index out of range")
+            elif "pump" in cmd:
+                valve = 0
+            else:
+                raise Exception("Object missing (valve or pump")
+            # TODO: send command to io class
+            return True, "Ok"
+        except:
+            print("{}".format(sys.exc_info()[0]))
+            return False, "Check server logs"
+
     def do_GET(self):
         try:
-            print("Request for " + self.path);
+            print("GET Request for " + self.path)
             if self.path in ["/favicon.ico","/pump.html"]:
                 file_to_open = open("." + self.path, 'rb').read()
-                self.send_response(200)
+                self.send_response(HTTPStatus.OK)
                 self.end_headers()
                 self.wfile.write(file_to_open)
                 return
             elif self.path in ["/pump-status"]:
-                self.send_response(200)
+                self.send_response(HTTPStatus.OK)
                 self.end_headers()
-                self.wfile.write("01101100".encode())
+                res = {
+                  # TODO: get this data from io class
+                  "valves": "{:08b}".format(random.randint(0,255)),
+                  "pump": "{:01b}".format(random.randint(0,1)),
+                  "status": "All is well"
+                }                
+                self.wfile.write(json.dumps(res).encode())
                 return
             else:
                 self.send_response(HTTPStatus.TEMPORARY_REDIRECT)
@@ -31,32 +66,33 @@ class webserverHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 return
 
-        except IOError:
-            self.send_error(404, "File not found.")
+        except:
+            print("{}".format(sys.exc_info()[0]))
+            self.send_error(HTTPStatus.INTERNAL_SERVER_ERROR, "Check server logs")
 
     def do_POST(self):
         try:
-            self.send_response(HTTPStatus.MOVED_PERMANENTLY) # weird!
-            self.send_header('Content-Type', 'text/html')
-            self.end_headers()
-            ctype, pdict = cgi.parse_header(self.headers.get('Content-Type'))
-            content_len = int(self.headers.get('Content-length'))
-            pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
-            pdict['CONTENT-LENGTH'] = content_len
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)
-                message_content = fields.get('message')
-            output = ''
-            output += '<html><body>'
-            output += '<h2> Okay, How about this: </h2>'
-            output += '<h1> %s </h1>' % message_content[0]
-            output += '<form method="POST" enctype="multipart/form-data" action="/hello"><h2> What would you like me to say?</h2><input name="message" type="text" /><input type="submit" value="Submit" /></form>'
-            output += '</body></html>'
-            self.wfile.write(output.encode())
-            print(output)
+            print("POST Request for " + self.path);
+            if self.path in ["/pump-command"]:
+                content_length = int(self.headers['Content-Length'])
+                post_data_json = self.rfile.read(content_length)
+                post_data = json.loads(post_data_json)
+                result, output = self.handleCommand(post_data)
+                if result:
+                    self.send_response(HTTPStatus.ACCEPTED)
+                else:
+                    self.send_response(HTTPStatus.BAD_REQUEST)
+                self.send_header('Content-Type', 'text/html')
+                self.end_headers()
+                self.wfile.write(output.encode())
+            else:
+                self.send_response(HTTPStatus.FORBIDDEN)
+                self.send_header('Content-Type', 'text/html')
+                self.end_headers()
+                return
         except:
-            self.send_error(404, "{}".format(sys.exc_info()[0]))
-            print(sys.exc_info())
+            print("{}".format(sys.exc_info()[0]))
+            self.send_error(HTTPStatus.INTERNAL_SERVER_ERROR, "Check server logs")
 
 
 def main():
