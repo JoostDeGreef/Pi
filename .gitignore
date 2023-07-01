@@ -33,3 +33,4 @@
 
 # Editor cache
 *~
+__pycache__

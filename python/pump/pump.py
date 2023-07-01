@@ -3,12 +3,16 @@
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+from state import State
+#import state
+
 import random
 import sys
 import json
 
 class webserverHandler(BaseHTTPRequestHandler):
     """docstring for webserverHandler"""
+    state = State()
 
     def handleCommand(self, cmd):
         # cmd: 'Toggle' / 'Off' / 'On'
@@ -33,7 +37,7 @@ class webserverHandler(BaseHTTPRequestHandler):
                 valve = 0
             else:
                 raise Exception("Object missing (valve or pump")
-            # TODO: send command to io class
+            self.state.setValue(valve, state)
             return True, "Ok"
         except:
             print("{}".format(sys.exc_info()[0]))
@@ -41,7 +45,7 @@ class webserverHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            print("GET Request for " + self.path)
+            print("GET Request for " + self.path + " from " + self.client_address[0])
             if self.path in ["/favicon.ico","/pump.html"]:
                 file_to_open = open("." + self.path, 'rb').read()
                 self.send_response(HTTPStatus.OK)
@@ -52,10 +56,11 @@ class webserverHandler(BaseHTTPRequestHandler):
                 self.send_response(HTTPStatus.OK)
                 self.end_headers()
                 res = {
-                  # TODO: get this data from io class
-                  "valves": "{:08b}".format(random.randint(0,255)),
-                  "pump": "{:01b}".format(random.randint(0,1)),
-                  "status": "All is well"
+                #   "valves": "{:08b}".format(random.randint(0,255)),
+                #   "pump": "{:01b}".format(random.randint(0,1)),
+                  "valves": self.state.getValves(),
+                  "pump": self.state.getPump(),
+                  "status": self.state.getStatus()
                 }                
                 self.wfile.write(json.dumps(res).encode())
                 return
