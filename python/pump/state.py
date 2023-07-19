@@ -1,28 +1,30 @@
+from hardware import Hardware
 
-
-class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-        
 class State(object):
-    __metaclass__ = Singleton
 
     pump = [0]
     valves = [0, 0, 0, 0, 0, 0, 0, 0]
-
+    hardware = Hardware()
+    
     def __init__(self):
         print("State initializing")
+        self._updateHardware()
+        for i in range(0, 8):
+            self.hardware.registerButton(i, self._buttonCallback)
+
+    def _buttonCallback(self, button):
+        #print("(state) Button {0} callback".format(button))
+        self.setValue(button+1,2);
 
     def _executeCmd(self, object, index, cmd):
         if cmd > 1:
             object[index] = 1 - object[index]
         else:
             object[index] = cmd
-        object[0]
             
+    def _updateHardware(self):
+        self.hardware.setPump(self.pump[0])
+        self.hardware.setValves(self.valves)
 
     def setValue(self, valve, cmd):
         # cmd 0, 1, 2
@@ -38,7 +40,8 @@ class State(object):
                 self._executeCmd(self.pump, 0, 0)
             else:
                 self._executeCmd(self.pump, 0, 1)
-
+        self._updateHardware()
+        
     def getValves(self):
         return "".join(str(v) for v in self.valves)
     

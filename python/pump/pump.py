@@ -2,11 +2,9 @@
 
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
 from state import State
-from hardware import Hardware
-#import state
 
+import RPi.GPIO as GPIO
 import random
 import sys
 import json
@@ -14,7 +12,6 @@ import json
 class webserverHandler(BaseHTTPRequestHandler):
     """docstring for webserverHandler"""
     state = State()
-    hardware = Hardware()
 
     def handleCommand(self, cmd):
         # cmd: 'Toggle' / 'Off' / 'On'
@@ -102,20 +99,25 @@ class webserverHandler(BaseHTTPRequestHandler):
             self.send_error(HTTPStatus.INTERNAL_SERVER_ERROR, "Check server logs")
 
 
+class StoppableHTTPServer(HTTPServer):
+    def run(self):
+        try:
+            self.serve_forever()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            self.server_close()
+
 def main():
-    try:
-        port = 8000
-        server = HTTPServer(('', port), webserverHandler)
-        # ctx = ssl.SSLContext(protocol=ssl.PROTOCOL_TLS_SERVER)
-        # ctx.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
-        # server.socket = ctx.wrap_socket(server.socket, server_side=True)
-        print("Web server running on port %s" % port)
-        server.serve_forever()
-
-    except KeyboardInterrupt:
-        print(" ^C entered stopping web server...")
-        server.socket.close()
-
+    port = 8000
+    server = StoppableHTTPServer(('', port), webserverHandler)
+    # ctx = ssl.SSLContext(protocol=ssl.PROTOCOL_TLS_SERVER)
+    # ctx.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
+    # server.socket = ctx.wrap_socket(server.socket, server_side=True)
+    print("Web server running on port %s" % port)
+    server.run()
+    GPIO.cleanup()
+    
 
 if __name__ == '__main__':
     main()
