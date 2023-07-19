@@ -4,6 +4,7 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from state import State
+from hardware import Hardware
 #import state
 
 import random
@@ -13,6 +14,7 @@ import json
 class webserverHandler(BaseHTTPRequestHandler):
     """docstring for webserverHandler"""
     state = State()
+    hardware = Hardware()
 
     def handleCommand(self, cmd):
         # cmd: 'Toggle' / 'Off' / 'On'

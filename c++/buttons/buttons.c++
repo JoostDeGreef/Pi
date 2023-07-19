@@ -11,7 +11,6 @@ const unsigned int GPIO_SCALE = 18;
 
 int led_state = 1;
 int scale = 0;
-int max_scale = 100;
 
 void buttonCallback(int gpio, int level, uint32_t tick);
 
@@ -147,8 +146,17 @@ void buttonCallback(int gpio, int level, uint32_t tick)
   {
     case 1: // rising edge
       led_state = 1 - led_state;
-cout << "\r" << led_state << flush;
-      gpioWrite(GPIO_LED_PWR, led_state);
+      if(gpio==GPIO_BTN0 && scale > 0)
+      {
+        scale--;
+      }
+      else if(gpio==GPIO_BTN1 && scale < 255)
+      {
+        scale++;
+      }
+      cout << "\r" << scale << flush;
+      gpioPWM(GPIO_SCALE, scale);
+      gpioWrite(GPIO_LED_PWR, led_state);      
       break;
     default:
       break;
@@ -165,7 +173,10 @@ int main()
     gpioWrite(GPIO_LED_PWR, led_state);
     
     gpioSetMode(GPIO_SCALE, PI_OUTPUT);
-    gpioPWM(GPIO_SCALE, 25);
+    //gpioSetPWMfrequency(GPIO_SCALE, 1000);
+    gpioSetPWMrange(GPIO_SCALE, 625);
+    gpioHardwarePWM(GPIO_SCALE, 1000000, 1000);
+    gpioPWM(GPIO_SCALE, scale);
   
     cout << "Hit enter key to exit..." << endl;
     cin.get();

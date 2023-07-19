@@ -21,6 +21,8 @@ class State(object):
             object[index] = 1 - object[index]
         else:
             object[index] = cmd
+        object[0]
+            
 
     def setValue(self, valve, cmd):
         # cmd 0, 1, 2
