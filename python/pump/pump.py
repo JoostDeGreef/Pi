@@ -15,7 +15,7 @@ class webserverHandler(BaseHTTPRequestHandler):
 
     def handleCommand(self, cmd):
         # cmd: 'Toggle' / 'Off' / 'On'
-        # valve: [1-6]
+        # valve: [1-8]
         # pump: 'All'
         print(cmd)
         try:
@@ -30,7 +30,7 @@ class webserverHandler(BaseHTTPRequestHandler):
                     raise Exception("Command not accepted")
             if "valve" in cmd:
                 valve = cmd["valve"]
-                if valve<1 or valve>6:
+                if valve<1 or valve>8:
                     raise Exception("Valve index out of range")
             elif "pump" in cmd:
                 valve = 0

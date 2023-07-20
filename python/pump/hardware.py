@@ -5,8 +5,12 @@ class Hardware(object):
     pump = [11]
     sensor = [18]
     valves = [16, 20, 21, 5, 6, 13, 19, 26]
-    buttons = [14, 15, 23, 24, 25, 8, 7, 12]
-    leds = [2, 3, 4, 17, 27, 22, 10, 9]
+
+    #buttons = [14, 15, 23, 24, 25,  8,  7, 12]
+    #leds =    [ 2,  3,  4, 17, 27, 22, 10,  9]
+
+    buttons = [15, 23,  7, 12, 14, 24,  8, 25]
+    leds =    [ 3,  4, 10,  9,  2, 17, 22, 27]
     
     callbacks = [None, None, None, None, None, None, None, None]
 

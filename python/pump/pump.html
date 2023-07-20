@@ -81,22 +81,28 @@
 
     <form>
       <button onclick="toggleValve(1)" id="valve1" class="styled transit" type="button">
-         Rose garden + hedge
+         Valve 1
       </button><br>
       <button onclick="toggleValve(2)" id="valve2" class="styled transit" type="button">
-         Side sprinklers
+         Valve 2
       </button><br>
       <button onclick="toggleValve(3)" id="valve3" class="styled transit" type="button">
-         Terras sprinklers
+         Valve 3
       </button><br>
       <button onclick="toggleValve(4)" id="valve4" class="styled transit" type="button">
-         Bordura sprinklers
+         Valve 4
       </button><br>
       <button onclick="toggleValve(5)" id="valve5" class="styled transit" type="button">
-         Front sprinkler
+         Valve 5
       </button><br>
       <button onclick="toggleValve(6)" id="valve6" class="styled transit" type="button">
-         Vegetable garden sprinklers
+         Valve 6
+      </button><br>
+      <button onclick="toggleValve(7)" id="valve7" class="styled transit" type="button">
+         Valve 7
+      </button><br>
+      <button onclick="toggleValve(8)" id="valve8" class="styled transit" type="button">
+         Valve 8
       </button><br>
       <br>
       <button onclick="shutdownPump()" id="pump" class="styled transit" type="button">
@@ -113,6 +119,8 @@ const btnValve3 = document.getElementById("valve3");
 const btnValve4 = document.getElementById("valve4");
 const btnValve5 = document.getElementById("valve5");
 const btnValve6 = document.getElementById("valve6");
+const btnValve7 = document.getElementById("valve7");
+const btnValve8 = document.getElementById("valve8");
 const btnPump = document.getElementById("pump");
 
 let updateDisplayTimeout = 0;
@@ -212,6 +220,8 @@ function updateDisplay() {
       setButtonClass(btnValve4, parseInt(valves.charAt(3)));
       setButtonClass(btnValve5, parseInt(valves.charAt(4)));
       setButtonClass(btnValve6, parseInt(valves.charAt(5)));
+      setButtonClass(btnValve7, parseInt(valves.charAt(6)));
+      setButtonClass(btnValve8, parseInt(valves.charAt(7)));
       statusDisplay.textContent = data['status'];
       updateDisplayTimeout = setTimeout(() => { updateDisplay(); }, 2000);
     })
@@ -224,6 +234,8 @@ function updateDisplay() {
       setButtonClass(btnValve4, 2);
       setButtonClass(btnValve5, 2);
       setButtonClass(btnValve6, 2);
+      setButtonClass(btnValve7, 2);
+      setButtonClass(btnValve8, 2);
       statusDisplay.textContent = `pump/valve status not received: ${error}`;
       updateDisplayTimeout = setTimeout(() => { updateDisplay(); }, 5000);
     });
