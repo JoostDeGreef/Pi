@@ -13,6 +13,9 @@ class webserverHandler(BaseHTTPRequestHandler):
     """docstring for webserverHandler"""
     state = State()
 
+    def log_message(self, format, *args):
+        pass
+
     def handleCommand(self, cmd):
         # cmd: 'Toggle' / 'Off' / 'On'
         # valve: [1-8]
@@ -44,7 +47,7 @@ class webserverHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            print("GET Request for " + self.path + " from " + self.client_address[0])
+            #print("GET Request for " + self.path + " from " + self.client_address[0])
             if self.path in ["/favicon.ico","/pump.html"]:
                 file_to_open = open("." + self.path, 'rb').read()
                 self.send_response(HTTPStatus.OK)
@@ -76,7 +79,7 @@ class webserverHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            print("POST Request for " + self.path);
+            #print("POST Request for " + self.path);
             if self.path in ["/pump-command"]:
                 content_length = int(self.headers['Content-Length'])
                 post_data_json = self.rfile.read(content_length)

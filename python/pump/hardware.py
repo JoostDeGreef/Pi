@@ -2,15 +2,12 @@ import RPi.GPIO as GPIO
 
 class Hardware(object):
 
-    pump = [11]
-    sensor = [18]
-    valves = [16, 20, 21, 5, 6, 13, 19, 26]
+    pump =    [23]
+    sensor =  [18]
+    valves =  [24, 25,  8,  7, 12, 16, 20, 21]
 
-    #buttons = [14, 15, 23, 24, 25,  8,  7, 12]
-    #leds =    [ 2,  3,  4, 17, 27, 22, 10,  9]
-
-    buttons = [15, 23,  7, 12, 14, 24,  8, 25]
-    leds =    [ 3,  4, 10,  9,  2, 17, 22, 27]
+    buttons = [26,  4, 27, 22,  9, 11,  5, 13]
+    leds =    [ 2, 14, 15, 17, 10,  6,  3, 19]
     
     callbacks = [None, None, None, None, None, None, None, None]
 
@@ -36,9 +33,9 @@ class Hardware(object):
 
     def setPump(self, status):
         if status == 0:
-            GPIO.output(self.pump, GPIO.LOW)
+            GPIO.output(self.pump[0], GPIO.LOW)
         else:
-            GPIO.output(self.pump, GPIO.HIGH)
+            GPIO.output(self.pump[0], GPIO.HIGH)
             
     def setValves(self, status):
         for i in range(0, len(self.valves)):
