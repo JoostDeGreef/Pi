@@ -4,10 +4,10 @@ class Hardware(object):
 
     pump =    [23]
     sensor =  [18]
-    valves =  [24, 25,  8,  7, 12, 16, 20, 21]
+    valves =  [19, 20, 21, 22, 24, 25, 26, 27]
 
-    buttons = [26,  4, 27, 22,  9, 11,  5, 13]
-    leds =    [ 2, 14, 15, 17, 10,  6,  3, 19]
+    buttons = [ 2,  3,  4,  5,  6,  7,  8,  9]
+    leds =    [10, 11, 12, 13, 14, 15, 16, 17]
     
     callbacks = [None, None, None, None, None, None, None, None]
 
@@ -22,8 +22,12 @@ class Hardware(object):
             GPIO.setup(valve, GPIO.OUT)
         for button in self.buttons:
             print("Configuring button on GPIO {0}".format(button))
-            GPIO.setup(button, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-            GPIO.add_event_detect(button, GPIO.RISING, callback=self._buttonCallback, bouncetime=70)   
+            if button == 2 or button == 3:
+                GPIO.setup(button, GPIO.IN)
+            else:
+                GPIO.setup(button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.add_event_detect(button, GPIO.RISING, callback=self._buttonCallback, bouncetime=300)   
+            #GPIO.add_event_detect(button, GPIO.FALLING, callback=self._buttonCallback, bouncetime=300)   
         for led in self.leds:
             print("Configuring led on GPIO {0}".format(led))
             GPIO.setup(led, GPIO.OUT)
@@ -40,10 +44,10 @@ class Hardware(object):
     def setValves(self, status):
         for i in range(0, len(self.valves)):
             if status[i] == 0:
-                GPIO.output(self.valves[i], GPIO.LOW)
+                GPIO.output(self.valves[i], GPIO.HIGH)
                 GPIO.output(self.leds[i], GPIO.LOW)
             else:
-                GPIO.output(self.valves[i], GPIO.HIGH)
+                GPIO.output(self.valves[i], GPIO.LOW)
                 GPIO.output(self.leds[i], GPIO.HIGH)
             
     def _buttonCallback(self, channel):
