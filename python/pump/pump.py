@@ -48,7 +48,7 @@ class webserverHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             #print("GET Request for " + self.path + " from " + self.client_address[0])
-            if self.path in ["/favicon.ico","/pump.html"]:
+            if self.path in ["/favicon.ico","/pump.html","/garden.png"]:
                 file_to_open = open("." + self.path, 'rb').read()
                 self.send_response(HTTPStatus.OK)
                 self.end_headers()
