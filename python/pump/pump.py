@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from http import HTTPStatus
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 from state import State
 
 import RPi.GPIO as GPIO
@@ -102,14 +102,18 @@ class webserverHandler(BaseHTTPRequestHandler):
             self.send_error(HTTPStatus.INTERNAL_SERVER_ERROR, "Check server logs")
 
 
-class StoppableHTTPServer(HTTPServer):
+#class StoppableHTTPServer(HTTPServer):
+class StoppableHTTPServer(ThreadingHTTPServer):
     def run(self):
+        restart = True
         try:
             self.serve_forever()
         except KeyboardInterrupt:
+            restart = False
             pass
         finally:
             self.server_close()
+            return restart
 
 def main():
     port = 8000
@@ -118,7 +122,9 @@ def main():
     # ctx.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
     # server.socket = ctx.wrap_socket(server.socket, server_side=True)
     print("Web server running on port %s" % port)
-    server.run()
+    while server.run():
+        print("Web server restarted")
+        sleep(1)
     GPIO.cleanup()
     
 
